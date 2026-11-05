@@ -7,6 +7,15 @@ module backend_dispatch_accept_demo (
     input  logic       branch_resolve_valid_i,
     output logic [1:0] dispatch_accept_count_o
 );
-    // TODO: accept only an ordered prefix and accept zero during recovery.
-    always_comb dispatch_accept_count_o = '0;
+    // Acceptance is a prefix. Recovery suppresses dispatch on this cycle.
+    always_comb begin
+        dispatch_accept_count_o = 2'd0;
+        if (!branch_resolve_valid_i && dispatch_count_i != 2'd0 &&
+            can_accept_lane_0_i) begin
+            dispatch_accept_count_o = 2'd1;
+            if (dispatch_count_i == 2'd2 && can_accept_lane_1_i) begin
+                dispatch_accept_count_o = 2'd2;
+            end
+        end
+    end
 endmodule
